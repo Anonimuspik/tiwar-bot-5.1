@@ -1,0 +1,31 @@
+{
+  "autoUndying": true,
+  "autoClanfight": true,
+  "autoKing": true,
+  "autoAltars": true,
+  "autoClancoliseum": true,
+  "autoSequentialFarm": true,
+  "sequentialOrder": [
+    "arena",
+    "clandungeon",
+    "campaign",
+    "career",
+    "sage",
+    "battles",
+    "league",
+    "coliseum",
+    "treasury",
+    "undying",
+    "clanquest",
+    "clanrecruit",
+    "clangreet",
+    "exchange",
+    "relic"
+  ],
+  "frozenTasks": [
+    "league",
+    "coliseum",
+    "clanquest",
+    "clangreet"
+  ]
+}

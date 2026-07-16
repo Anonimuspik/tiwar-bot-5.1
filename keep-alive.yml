@@ -1,0 +1,48 @@
+name: Tiwar Auto-Hunt Bot
+
+on:
+  schedule:
+    # Страховочный крон — запускает бота если цепочка вдруг оборвалась.
+    # Каждые 6 часов. В норме бот перезапускается сам через API (см. ниже).
+    - cron: '0 */6 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run bot
+        env:
+          COOKIES_JSON: ${{ secrets.COOKIES_JSON }}
+          GAME_URL: 'https://tiwar.ru/'
+          RUN_MINUTES: '340'
+        run: node bot.js
+
+      # ── После завершения бота сразу триггерим следующий запуск ──────────────
+      # Используем встроенный GITHUB_TOKEN — дополнительных секретов не нужно.
+      - name: Trigger next run
+        if: always()   # запускаем даже если bot упал, чтобы цепочка не рвалась
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Запускаем следующую итерацию бота..."
+          gh workflow run keep-alive.yml \
+            --repo "${{ github.repository }}" \
+            --ref "${{ github.ref_name }}"
+          echo "Следующий запуск поставлен в очередь."
